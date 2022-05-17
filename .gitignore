@@ -1,0 +1,12 @@
+
+# Various files and folders
+/target
+.DS_STORE
+.idea
+
+
+# Media file types
+*.png
+*.jpg
+*.smf
+*.ppm
