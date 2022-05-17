@@ -14,7 +14,7 @@ mod materials;
 mod utils;
 
 fn main() {
-    let dimension = 512;
+    let dimension = 50;
     let resolution = (dimension, dimension);
     let mut scene = Scene::new(
         resolution,
@@ -151,23 +151,23 @@ fn main() {
 
     // ======================
 
-    let mut teddy = load_smf_mesh("teddy.smf", true);
+    let mut teddy = load_smf_mesh("models/teddy.smf", true);
     teddy.translate(vec3![-4.0, -1.3, -3.0]);
     teddy.scale(vec3![0.05, 0.05, 0.05]);
     teddy.rotate(vec3![0.0, 35.0, 0.0]);
     teddy.set_material(Material::Phong(Phong::new(vec3![102.0, 0.0, 102.0], 0.5, 0.75, 25.0 , 0.45)));
 
-    let mut frog = load_smf_mesh("frog.smf", true);
+    let mut frog = load_smf_mesh("models/frog.smf", true);
     frog.translate(vec3![-1.8, -0.55, -6.5]);
     frog.rotate(vec3![10.0, 135.0, 30.0]);
     frog.set_material(Material::Phong(Phong::new(vec3![35.0, 65.0, 245.0], 0.25, 1.0, 3.0 , 0.15)));
 
-    let mut bunny = load_smf_mesh("bound-bunny_5k.smf", true);
+    let mut bunny = load_smf_mesh("models/bound-bunny_5k.smf", true);
     bunny.translate( vec3![-0.5, 0.6, -2.0]);
     bunny.rotate(vec3![0.0, -25.0, 20.0]);
     bunny.set_material(Material::Phong(Phong::new(vec3![41.0, 238.0, 47.0], 0.1, 0.85, 15.0 , 0.15)));
 
-    let mut penguin = load_smf_mesh("penguin.smf", true);
+    let mut penguin = load_smf_mesh("models/penguin.smf", true);
     penguin.rotate(vec3![0.0, 0.0, 90.0]);
     penguin.translate(vec3![-0.86, -0.92, -2.5]);
     penguin.set_material(Material::Phong(Phong::new(vec3![200.0, 200.0, 66.0], 0.35, 0.4, 20.0 , 0.15)));

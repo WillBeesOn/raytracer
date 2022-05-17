@@ -7,10 +7,6 @@ Camera is at the origin [0.0, 0.0, 0.0]
 Camera view direction is [0.0, 0.0, -1.0]
 Camera up direction is [0.0, 1.0, 0.0]
 
-Images at https://www.cs.drexel.edu/~wtb35/cs636/hw4.html
+Images at https://www.cs.drexel.edu/~wtb35/cs636/hw5.html
 
 Source code of note...
-
-Entrypoint for rendering with adaptive AA - objects/scene.rs, render_supersample_frame_threaded, line 176
-
-Recursive adaptive AA - objects/scene.rs, supersample_recurse, line 244
