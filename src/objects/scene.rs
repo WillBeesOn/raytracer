@@ -6,9 +6,11 @@ use std::thread;
 use std::sync::mpsc;
 use std::sync::mpsc::{Receiver, Sender};
 use crate::materials::Mat;
-use crate::{Camera, Hittable, HittableList, Ray, Vec3, vec3, Light, Material, Vector};
+use crate::{Camera, Hittable, HittableList, Ray, Vec3, vec3, Light, Material, Vector, WorldLight};
 use crate::data_structures::{BvhNode};
 use crate::traits::HitData;
+
+const PARALLEL_TOLERANCE: f64 = 1e-8;
 
 
 // Define a super trait for objects in the world.
@@ -43,6 +45,7 @@ impl Clone for Box<dyn SceneObject> {
 // Stores all the objects that exist in the scene and the camera by which to view the scene.
 pub struct Scene {
     pub main_camera: Camera,
+    render_shadows: bool,
     acc_obj_num: u64,
     bvh_root: BvhNode,
     render_distance: f64,
@@ -53,12 +56,13 @@ pub struct Scene {
 }
 
 impl Scene {
-    pub fn new(render_resolution: (u32, u32), render_distance: f64, background_color: Vec3, hfov: f64, acc_obj_num: u64) -> Self {
+    pub fn new(render_resolution: (u32, u32), render_distance: f64, background_color: Vec3, hfov: f64, acc_obj_num: u64, render_shadows: bool) -> Self {
         Scene {
             render_resolution,
             render_distance,
             background_color,
             acc_obj_num,
+            render_shadows,
             bvh_root: BvhNode::new(),
             main_camera: Camera::new(render_resolution, hfov),
             lights: vec![],
@@ -100,7 +104,40 @@ impl Scene {
 
         // If it hit something, return the color of the object.
         if hit.did_hit {
-            hit.mat.get_color(&self.lights, &hit)
+            let base_surface_color = hit.mat.get_color(&self.lights, &hit); // Base color of the surface with no shadows
+            let mut final_color = base_surface_color; // Keep track of the final surface color
+
+            // Compute shadows.
+            if self.render_shadows {
+                for light in &self.lights {
+                    // Check if there are any objects between surface and all lights.
+                    // Raise ray origin a bit outside the object in case rounding error puts the hit_point inside the object
+                    let new_ray_origin = hit.hit_point + (hit.normal * 10e-6);
+                    let hit_to_light = light.get_position() - hit.hit_point;
+                    let new_ray = Ray::new(new_ray_origin, hit_to_light.unit());
+
+                    // Find if hit normal and vec to light are the same direction.
+                    // Don't add shadow in this case since the darker lighting is handled by the lighting code.
+                    if hit.normal.dot(new_ray.direction) <= PARALLEL_TOLERANCE || hit.normal.dot(new_ray.direction).abs() <= PARALLEL_TOLERANCE {
+                        continue;
+                    }
+
+                    let mut new_hit = HitData::new();
+                    if self.acc_obj_num > 0 {
+                        new_hit = self.bvh_root.hit(new_ray, 0.0, hit_to_light.length());
+                    } else {
+                        new_hit = self.objects.hit(new_ray, 0.0, hit_to_light.length());
+                    }
+
+                    // For each light the produces a shadow (something in between surface and light),
+                    // subtract a portion of the original surface color to create the shadow
+                    if new_hit.did_hit && new_ray.direction.dot(new_hit.normal) <= PARALLEL_TOLERANCE {
+                        final_color -= 0.3 * base_surface_color;
+                        //final_color = vec3![0.0, 0.0, 0.0];
+                    }
+                }
+            }
+            final_color
         } else {
             // If nothing hit, then return the background color.
             self.background_color
