@@ -86,6 +86,11 @@ impl Hittable for Triangle {
     fn hit(&self, ray: Ray, t_min: f64, t_max: f64) -> HitData {
         let mut found_hit = HitData::new();
 
+        // Return if surface normal is in same direction of ray. It's a backfacing triangle.
+        if self.surface_normal.dot(ray.direction) >= PARALLEL_TOLERANCE {
+            return found_hit;
+        }
+
         let vert1 = self.vertices[0].to_vec3();
         let vert2 = self.vertices[1].to_vec3();
         let vert3 = self.vertices[2].to_vec3();

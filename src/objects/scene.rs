@@ -112,28 +112,32 @@ impl Scene {
                 for light in &self.lights {
                     // Check if there are any objects between surface and all lights.
                     // Raise ray origin a bit outside the object in case rounding error puts the hit_point inside the object
-                    let new_ray_origin = hit.hit_point + (hit.normal * 10e-6);
+                    let shadow_ray_origin = hit.hit_point + (hit.normal * 10e-6);
                     let hit_to_light = light.get_position() - hit.hit_point;
-                    let new_ray = Ray::new(new_ray_origin, hit_to_light.unit());
+                    let shadow_ray = Ray::new(shadow_ray_origin, hit_to_light.unit());
 
-                    // Find if hit normal and vec to light are the same direction.
-                    // Don't add shadow in this case since the darker lighting is handled by the lighting code.
-                    if hit.normal.dot(new_ray.direction) <= PARALLEL_TOLERANCE || hit.normal.dot(new_ray.direction).abs() <= PARALLEL_TOLERANCE {
+                    // Ensure shadow is only rendered if surface is facing the light source.
+                    // The color of the side of objects pointing away from the light source are computed
+                    // just fine with the lighting code. Otherwise these areas get unnatural looking
+                    // shadows from self-intersection
+                    let norm_dot_shadow_dir = hit.normal.dot(shadow_ray.direction);
+                    if norm_dot_shadow_dir <= PARALLEL_TOLERANCE || norm_dot_shadow_dir.abs() <= PARALLEL_TOLERANCE {
                         continue;
                     }
 
-                    let mut new_hit = HitData::new();
+                    // Send the new ray in the direction of the light to find if there's anything in between,
+                    // and only go as far as the light is.
+                    let mut shadow_hit = HitData::new();
                     if self.acc_obj_num > 0 {
-                        new_hit = self.bvh_root.hit(new_ray, 0.0, hit_to_light.length());
+                        shadow_hit = self.bvh_root.hit(shadow_ray, 0.0, hit_to_light.length());
                     } else {
-                        new_hit = self.objects.hit(new_ray, 0.0, hit_to_light.length());
+                        shadow_hit = self.objects.hit(shadow_ray, 0.0, hit_to_light.length());
                     }
 
                     // For each light the produces a shadow (something in between surface and light),
                     // subtract a portion of the original surface color to create the shadow
-                    if new_hit.did_hit && new_ray.direction.dot(new_hit.normal) <= PARALLEL_TOLERANCE {
+                    if shadow_hit.did_hit && shadow_ray.direction.dot(shadow_hit.normal) <= PARALLEL_TOLERANCE {
                         final_color -= 0.3 * base_surface_color;
-                        //final_color = vec3![0.0, 0.0, 0.0];
                     }
                 }
             }
