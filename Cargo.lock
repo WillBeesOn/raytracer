@@ -3,15 +3,6 @@
 version = 3
 
 [[package]]
-name = "HW3"
-version = "0.1.0"
-dependencies = [
- "image",
- "nalgebra",
- "rand",
-]
-
-[[package]]
 name = "adler"
 version = "1.0.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -583,6 +574,15 @@ dependencies = [
  "crossbeam-utils",
  "lazy_static",
  "num_cpus",
+]
+
+[[package]]
+name = "rust-raytracer"
+version = "0.1.0"
+dependencies = [
+ "image",
+ "nalgebra",
+ "rand",
 ]
 
 [[package]]

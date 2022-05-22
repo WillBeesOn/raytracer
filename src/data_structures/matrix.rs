@@ -3,7 +3,6 @@ use std::slice::Iter;
 use crate::data_structures::{Vec4, Vector};
 use crate::{Vec3, vec4};
 use nalgebra::Matrix4 as NalMatrix4;
-use crate::Light::PointLight;
 
 // Struct for a matrix with a width of 4. Will typically be used for transformations.
 #[derive(Debug)]

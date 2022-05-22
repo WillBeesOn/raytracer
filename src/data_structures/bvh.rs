@@ -1,3 +1,4 @@
+use std::cmp::Ordering;
 use crate::objects::BoundingVolume;
 use crate::{Hittable, HittableList, Ray, Vec3, vec3};
 use crate::traits::HitData;
@@ -50,14 +51,15 @@ impl BvhNode {
 
             // Split BVH into a 4 degree tree.
             // Need to split objects into 4, and then spread remainder across the existing partitions.
-            let quarter = (list_len as f64 / 4.0).floor() as usize;
-            let mut obj_per_list = [quarter; 4];
-            let mut obj_remainder = list_len % quarter;
-            let remainder_per_list = (obj_remainder as f64 / 4.0).ceil() as usize;
+            let tree_degree = 2.0; // If changing this, make sure to change obj_per_list
+            let split = (list_len as f64 / tree_degree).floor() as usize;
+            let mut obj_per_list = [split; 2];
+            let mut obj_remainder = list_len % split;
+            let remainder_per_list = (obj_remainder as f64 / tree_degree).ceil() as usize;
 
             let mut start = 0;  // Index where in object_list to start extracting objects
             let mut end = 0; // Index where in object_list to stop extracting objects
-            for i in 0..4 {
+            for i in 0..tree_degree as usize {
                 let mut amount_to_add = remainder_per_list;
                 if obj_remainder > 0 {
                     // If adding the last bit of remainder makes it use more than really remains,
@@ -83,6 +85,18 @@ impl BvhNode {
                         threshold
                     ));
             }
+
+            //println!("{}, {}", new_node.children[0].volume.max.z, new_node.children[1].volume.max.z);
+            new_node.children.sort_by(|a, b| {
+                // Checks if a is (order) to b
+                if a.volume.max.z > b.volume.max.z {
+                    Ordering::Less
+                } else if a.volume.max.z < b.volume.max.z {
+                    Ordering::Greater
+                } else {
+                    Ordering::Equal
+                }
+            });
         }
         new_node
     }
@@ -96,7 +110,6 @@ impl BvhNode {
         // Initialize the closest hit. Which of course doesn't hit and t is at the max distance.
         let mut closest_hit = HitData::new();
 
-
         // If this node's volume was hit and it has children, check the child nodes for hits
         if did_hit && self.children.len() > 0 {
             // Go through each child and get the hit data. If the ray hit something while going down the
@@ -108,6 +121,7 @@ impl BvhNode {
                 }
             }
         }
+
 
         // If this a leaf node (no child nodes) then test the objects in this node for intersection.
         if did_hit && self.children.len() == 0 {

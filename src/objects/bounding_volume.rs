@@ -3,8 +3,8 @@ use crate::{Ray, Vec3};
 // Represents a rectangular bounding volume for a 3D object.
 #[derive(Debug, Copy, Clone)]
 pub struct BoundingVolume {
-    pub min: Vec3,
-    pub max: Vec3
+    pub min: Vec3, // Typically bottom left corner farthest from camera
+    pub max: Vec3 // Typically top right corner closest to camera
 }
 
 impl BoundingVolume {
