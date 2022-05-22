@@ -1,11 +1,11 @@
 use std::time::Instant;
 
-use crate::objects::{PointLight, Sphere, SceneObject, WorldLight, Light, Plane};
+use crate::objects::{SceneObject, WorldLight, Light};
 use crate::objects::{Camera, Scene};
-use crate::data_structures::{Matrix4, Ray, Vec3, Vec4, Vector};
-use crate::materials::{Flat, Material, Phong};
+use crate::data_structures::{Ray, Vec3, Vector};
+use crate::materials::{Material};
 use crate::traits::{Hittable, HittableList};
-use crate::utils::{load_smf_mesh, save_png, supersample};
+use crate::utils::{save_png};
 
 mod objects;
 mod data_structures;

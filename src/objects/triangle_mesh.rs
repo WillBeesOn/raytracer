@@ -4,7 +4,7 @@ use crate::traits::Hittable;
 use crate::materials::{Material, Flat};
 use crate::objects::{BoundingVolume, Triangle};
 use crate::traits::HitData;
-use crate::utils::{deg_to_rad, scale_m, rotate_m, translate_m};
+use crate::utils::{deg_to_rad, rotate_m, translate_m};
 
 pub struct TriangleMesh {
     pub smooth: bool,

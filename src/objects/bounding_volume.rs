@@ -1,4 +1,4 @@
-use crate::{Ray, Vec3, vec3};
+use crate::{Ray, Vec3};
 
 // Represents a rectangular bounding volume for a 3D object.
 #[derive(Debug, Copy, Clone)]

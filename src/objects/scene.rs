@@ -1,10 +1,8 @@
 use std::collections::HashMap;
-use std::hash::Hash;
 use std::ops::DerefMut;
 use std::sync::{Arc, Mutex};
 use std::thread;
 use std::sync::mpsc;
-use std::sync::mpsc::{Receiver, Sender};
 use crate::materials::Mat;
 use crate::{Camera, Hittable, HittableList, Ray, Vec3, vec3, Light, Material, Vector, WorldLight};
 use crate::data_structures::{BvhNode};
