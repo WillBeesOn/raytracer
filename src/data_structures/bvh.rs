@@ -1,4 +1,5 @@
 use std::cmp::Ordering;
+use std::ops::Bound;
 use crate::objects::BoundingVolume;
 use crate::{Hittable, HittableList, Ray, Vec3, vec3};
 use crate::traits::HitData;
@@ -85,18 +86,6 @@ impl BvhNode {
                         threshold
                     ));
             }
-
-            //println!("{}, {}", new_node.children[0].volume.max.z, new_node.children[1].volume.max.z);
-            new_node.children.sort_by(|a, b| {
-                // Checks if a is (order) to b
-                if a.volume.max.z > b.volume.max.z {
-                    Ordering::Less
-                } else if a.volume.max.z < b.volume.max.z {
-                    Ordering::Greater
-                } else {
-                    Ordering::Equal
-                }
-            });
         }
         new_node
     }
@@ -112,14 +101,49 @@ impl BvhNode {
 
         // If this node's volume was hit and it has children, check the child nodes for hits
         if did_hit && self.children.len() > 0 {
-            // Go through each child and get the hit data. If the ray hit something while going down the
-            // tree, check to see if it is the closest.
-            for child in self.children.iter() {
-                let hit = child.hit(ray, t_min, t_max);
-                if hit.did_hit && hit.t < closest_hit.t {
-                    closest_hit = hit;
+            // Find the direction the ray points in the most
+            let mut axis: usize = 0;
+            let mut highest_dir: Option<f64> = None;
+            for i in 0..3 {
+                if let Some(highest) = highest_dir {
+                    if highest < ray.direction[i].abs() {
+                        highest_dir = Some(ray.direction[i].abs());
+                        axis = i;
+                    }
+                } else {
+                    highest_dir = Some(ray.direction[i].abs());
+                    axis = i;
                 }
             }
+
+            // Hacky way of sorting child BVH nodes, not great. Making self mutable is too much work for now, so this is good enough.
+            let mut vols = vec![];
+            for child in self.children.iter() {
+                vols.push(child.volume.clone());
+            }
+            let mut vol_clone = vols.clone();
+            BoundingVolume::sort_by_axis(&mut vol_clone, axis as u8);
+
+            // Reverse the order of checking children if volume sorting changed the order
+            let reverse_order = vols[0].min == vol_clone[0].min;
+
+            // Go through each child and get the hit data. If the ray hit something while going down the
+            // tree, check to see if it is the closest.
+            if reverse_order {
+                for child in self.children.iter().rev() {
+                    let hit = child.hit(ray, t_min, t_max);
+                    if hit.did_hit && hit.t < closest_hit.t {
+                        closest_hit = hit;
+                    }
+                }
+            } else {
+                for child in self.children.iter() {
+                    let hit = child.hit(ray, t_min, t_max);
+                    if hit.did_hit && hit.t < closest_hit.t {
+                        closest_hit = hit;
+                    }
+                }
+            };
         }
 
 

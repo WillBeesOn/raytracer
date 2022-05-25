@@ -1,30 +1,24 @@
-use crate::{Light, Vec3};
-use crate::materials::{Flat, Phong};
+use crate::{Light, Ray, Scene, Vec3};
+use crate::materials::{Flat, Hall, Phong};
 use crate::traits::HitData;
 
 pub trait Mat {
-    fn get_color(&self, lights: &Vec<Light>, hit: &HitData) -> Vec3;
-    fn set_color(&mut self, color: Vec3);
+    fn get_color(&self, scene: &Scene, incoming_ray: Ray, hit: &HitData, reflect_depth: u32) -> Vec3;
 }
 
 #[derive(Debug, Copy, Clone)]
 pub enum Material {
     Flat(Flat),
-    Phong(Phong)
+    Phong(Phong),
+    Hall(Hall)
 }
 
 impl Mat for Material {
-    fn get_color(&self, lights: &Vec<Light>, hit: &HitData) -> Vec3 {
+    fn get_color(&self, scene: &Scene, incoming_ray: Ray, hit: &HitData, reflect_depth: u32) -> Vec3 {
         match self {
-            Material::Flat(mat) => mat.get_color(lights, hit),
-            Material::Phong(mat) => mat.get_color(lights, hit)
-        }
-    }
-
-    fn set_color(&mut self, color: Vec3) {
-        match self {
-            Material::Flat(mat) => mat.set_color(color),
-            Material::Phong(mat) => mat.set_color(color)
+            Material::Flat(mat) => mat.get_color(scene, incoming_ray, hit, reflect_depth),
+            Material::Phong(mat) => mat.get_color(scene, incoming_ray, hit, reflect_depth),
+            Material::Hall(mat) => mat.get_color(scene, incoming_ray, hit, reflect_depth)
         }
     }
 }

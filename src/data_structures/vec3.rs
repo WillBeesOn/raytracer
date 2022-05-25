@@ -42,6 +42,13 @@ impl Vec3 {
     pub fn to_vec4(self, w: f64) -> Vec4 {
         vec4![self.x, self.y, self.z, w]
     }
+
+    // Given a normal vector of a surface, find the reflected unit vector
+    // Assumes the vector being operated on is going inward toward the normal's origin, hence the negation.
+    pub fn reflect(&self, normal: Vec3) -> Vec3 {
+        let incoming = -1.0 * self.unit();
+        2.0 * (normal.dot(incoming).max(0.0) * normal) - incoming
+    }
 }
 
 impl Display for Vec3 {

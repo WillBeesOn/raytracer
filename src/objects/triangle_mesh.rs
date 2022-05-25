@@ -17,7 +17,7 @@ pub struct TriangleMesh {
 
 impl TriangleMesh {
     pub fn new(vertices: Matrix4, faces: Vec<Vec3>, smooth: bool) -> Self {
-        let material = Material::Flat(Flat::new(vec3![0.5, 0.5, 0.5]));
+        let material = Material::Flat(Flat::new(vec3![0.5, 0.5, 0.5], 0.0));
         let mut triangles = vec![];
         let mut vertex_normals = vec![vec3![0.0, 0.0, 0.0]; vertices.len()];  // Keep track of vert norms
         let mut vertex_indices = vec![]; // Keep track of vertex indices for each triangle to later assign the correct vertex normals

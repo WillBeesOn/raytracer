@@ -77,3 +77,8 @@ impl WorldLight for PointLight {
         self.position = position;
     }
 }
+
+#[derive(Debug, Copy, Clone)]
+pub struct AmbientLight {
+    pub intensity: Vec3
+}
