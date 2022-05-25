@@ -33,7 +33,7 @@ impl HitData {
             hit_point: vec3![0.0, 0.0, 0.0],
             ray: Ray::new(vec3![0.0, 0.0, 0.0], vec3![0.0, 0.0, 0.0]),
             normal: vec3![0.0, 0.0, 0.0],
-            mat: Material::Flat(Flat::new(vec3![0.5, 0.5, 0.5])),
+            mat: Material::Flat(Flat::new(vec3![0.5, 0.5, 0.5], 0.0)),
             did_hit: false
         }
     }
@@ -125,7 +125,7 @@ impl HittableList {
     }
 
     pub fn sort_by_axis(&mut self, axis: u8) {
-        self.data.sort_by(|a, b| {
+        self.data.clone().sort_by(|a, b| {
             let a_pos = a.get_position();
             let b_pos = b.get_position();
             match axis {

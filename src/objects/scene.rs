@@ -6,6 +6,7 @@ use std::sync::mpsc;
 use crate::materials::Mat;
 use crate::{Camera, Hittable, HittableList, Ray, Vec3, vec3, Light, Material, Vector, WorldLight};
 use crate::data_structures::{BvhNode};
+use crate::objects::AmbientLight;
 use crate::traits::HitData;
 
 const PARALLEL_TOLERANCE: f64 = 1e-8;
@@ -45,25 +46,29 @@ pub struct Scene {
     pub main_camera: Camera,
     render_shadows: bool,
     acc_obj_num: u64,
+    reflect_depth: u32,
     bvh_root: BvhNode,
     render_distance: f64,
     objects: HittableList,
     background_color: Vec3,
     lights: Vec<Light>,
+    ambient_lights: Vec<AmbientLight>,
     render_resolution: (u32, u32),
 }
 
 impl Scene {
-    pub fn new(render_resolution: (u32, u32), render_distance: f64, background_color: Vec3, hfov: f64, acc_obj_num: u64, render_shadows: bool) -> Self {
+    pub fn new(render_resolution: (u32, u32), render_distance: f64, background_color: Vec3, hfov: f64, acc_obj_num: u64, reflect_depth: u32, render_shadows: bool) -> Self {
         Scene {
             render_resolution,
             render_distance,
             background_color,
             acc_obj_num,
+            reflect_depth,
             render_shadows,
             bvh_root: BvhNode::new(),
             main_camera: Camera::new(render_resolution, hfov),
             lights: vec![],
+            ambient_lights: vec![],
             objects: HittableList::new()
         }
     }
@@ -84,14 +89,30 @@ impl Scene {
         self.lights.push(light);
     }
 
+    pub fn push_ambient_light(&mut self, light: AmbientLight) {
+        self.ambient_lights.push(light);
+    }
+
+    pub fn get_lights(&self) -> &Vec<Light> {
+        &self.lights
+    }
+
+    pub fn get_ambient_lights(&self) -> &Vec<AmbientLight> {
+        &self.ambient_lights
+    }
+
+    pub fn get_reflect_depth(&self) -> u32 {
+        self.reflect_depth
+    }
+
     // Given normalized pixel location return the color to render.
     pub fn get_color_at_pixel(&self, x: f64, y: f64) -> Vec3 {
         // Get the ray going from the camera origin to the chosen pixel location
-        self.get_color_from_ray(self.main_camera.get_ray(x, y))
+        self.get_color_from_ray(self.main_camera.get_ray(x, y), 0)
     }
 
     // Given a ray extending into the scene, get the color of the object that the ray intersects.
-    fn get_color_from_ray(&self, ray: Ray) -> Vec3 {
+    pub(crate) fn get_color_from_ray(&self, ray: Ray, depth: u32) -> Vec3 {
         // Get the closest scene object that is hit by the ray. Optionally use BVH for acceleration.
         let mut hit = HitData::new();
         if self.acc_obj_num > 0 {
@@ -102,7 +123,8 @@ impl Scene {
 
         // If it hit something, return the color of the object.
         if hit.did_hit {
-            let base_surface_color = hit.mat.get_color(&self.lights, &hit); // Base color of the surface with no shadows
+            let base_surface_color = hit.mat.get_color(&self, ray, &hit, depth); // Base color of the surface with no shadows
+            let new_ray_origin = hit.hit_point + (hit.normal * 10e-6); // Origin for shadow rays
             let mut final_color = base_surface_color; // Keep track of the final surface color
 
             // Compute shadows.
@@ -110,9 +132,9 @@ impl Scene {
                 for light in &self.lights {
                     // Check if there are any objects between surface and all lights.
                     // Raise ray origin a bit outside the object in case rounding error puts the hit_point inside the object
-                    let shadow_ray_origin = hit.hit_point + (hit.normal * 10e-6);
+
                     let hit_to_light = light.get_position() - hit.hit_point;
-                    let shadow_ray = Ray::new(shadow_ray_origin, hit_to_light.unit());
+                    let shadow_ray = Ray::new(new_ray_origin, hit_to_light.unit());
 
                     // Ensure shadow is only rendered if surface is facing the light source.
                     // The color of the side of objects pointing away from the light source are computed

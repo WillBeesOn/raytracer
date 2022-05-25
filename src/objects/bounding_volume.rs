@@ -1,4 +1,6 @@
-use crate::{Ray, Vec3};
+use std::cmp::Ordering::Equal;
+use std::ops::Bound;
+use crate::{Ray, Vec3, vec3};
 
 // Represents a rectangular bounding volume for a 3D object.
 #[derive(Debug, Copy, Clone)]
@@ -29,5 +31,35 @@ impl BoundingVolume {
         }
         // If the ray intersects with all axes of the box, then it does intersect.
         return true;
+    }
+
+    pub fn get_position(&self) -> Vec3 {
+        self.min + (self.max - self.min) / 2.0
+    }
+
+    pub fn sort_by_axis(vols: &mut Vec<BoundingVolume>, axis: u8) {
+        vols.sort_by(|a, b| {
+            let a_pos = a.get_position();
+            let b_pos = b.get_position();
+            match axis {
+                // Sort objects by position (centroid) along x axis
+                0 => {
+                    a_pos.x.partial_cmp(&b_pos.x).unwrap_or(Equal)
+                },
+
+                // Sort objects by position (centroid) along y axis
+                1 => {
+                    a_pos.y.partial_cmp(&b_pos.y).unwrap_or(Equal)
+                },
+
+                // Sort objects by position (centroid) along z axis
+                2 => {
+                    a_pos.z.partial_cmp(&b_pos.z).unwrap_or(Equal)
+                },
+
+                // Default case
+                _ => Equal
+            }
+        });
     }
 }

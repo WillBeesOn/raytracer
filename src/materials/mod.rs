@@ -7,3 +7,6 @@ pub use flat::*;
 mod phong;
 pub use phong::*;
 
+mod hall;
+pub use hall::*;
+
