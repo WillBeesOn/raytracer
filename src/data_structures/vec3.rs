@@ -43,11 +43,24 @@ impl Vec3 {
         vec4![self.x, self.y, self.z, w]
     }
 
-    // Given a normal vector of a surface, find the reflected unit vector
+    // Given a normal vector of a surface, find the reflected unit vector.
     // Assumes the vector being operated on is going inward toward the normal's origin, hence the negation.
-    pub fn reflect(&self, normal: Vec3) -> Vec3 {
+    pub fn reflect(self, normal: Vec3) -> Vec3 {
         let incoming = -1.0 * self.unit();
         2.0 * (normal.dot(incoming).max(0.0) * normal) - incoming
+    }
+
+    // Given a normal vector of a surface and the ratio of refractive indices between materials,
+    // use this vector instance as the view vector to find the refraction direction as light passes
+    // from one material to the next.
+    pub fn refract(self, normal: Vec3, ratio: f64) -> Vec3 {
+        let dot = self.dot(normal);
+        let sqrt = 1.0 - ratio * ratio * (1.0 - dot * dot);
+        if sqrt < 0.0 {
+            vec3![0.0, 0.0, 0.0]
+        } else {
+            (ratio * self - (ratio * dot + sqrt.sqrt()) * normal).unit() // Normalize vector just in case
+        }
     }
 }
 

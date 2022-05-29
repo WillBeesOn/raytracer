@@ -46,9 +46,10 @@ pub struct Scene {
     pub main_camera: Camera,
     render_shadows: bool,
     acc_obj_num: u64,
-    reflect_depth: u32,
+    ray_depth: u32,
     bvh_root: BvhNode,
     render_distance: f64,
+    refractive_index: f64,
     objects: HittableList,
     background_color: Vec3,
     lights: Vec<Light>,
@@ -57,13 +58,14 @@ pub struct Scene {
 }
 
 impl Scene {
-    pub fn new(render_resolution: (u32, u32), render_distance: f64, background_color: Vec3, hfov: f64, acc_obj_num: u64, reflect_depth: u32, render_shadows: bool) -> Self {
+    pub fn new(render_resolution: (u32, u32), render_distance: f64, background_color: Vec3, hfov: f64, acc_obj_num: u64, ray_depth: u32, refractive_index:f64, render_shadows: bool) -> Self {
         Scene {
             render_resolution,
             render_distance,
             background_color,
             acc_obj_num,
-            reflect_depth,
+            ray_depth,
+            refractive_index,
             render_shadows,
             bvh_root: BvhNode::new(),
             main_camera: Camera::new(render_resolution, hfov),
@@ -101,8 +103,12 @@ impl Scene {
         &self.ambient_lights
     }
 
-    pub fn get_reflect_depth(&self) -> u32 {
-        self.reflect_depth
+    pub fn get_ray_depth(&self) -> u32 {
+        self.ray_depth
+    }
+
+    pub fn get_refractive_index(&self) -> f64 {
+        self.refractive_index
     }
 
     // Given normalized pixel location return the color to render.
@@ -112,7 +118,7 @@ impl Scene {
     }
 
     // Given a ray extending into the scene, get the color of the object that the ray intersects.
-    pub(crate) fn get_color_from_ray(&self, ray: Ray, depth: u32) -> Vec3 {
+    pub fn get_color_from_ray(&self, ray: Ray, depth: u32) -> Vec3 {
         // Get the closest scene object that is hit by the ray. Optionally use BVH for acceleration.
         let mut hit = HitData::new();
         if self.acc_obj_num > 0 {
