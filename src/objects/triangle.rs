@@ -19,7 +19,6 @@ impl Triangle {
         Triangle { surface_normal, vertex_normals, vertices, material, smooth }
     }
 
-    // TODO applying transformation to normals isn't quite right. Need to use transpose of inverse of transformation matrix.
     pub fn transform(&mut self, transformation: &Matrix4, transform_normals: bool) {
         self.vertices = &self.vertices * transformation;
         if transform_normals {

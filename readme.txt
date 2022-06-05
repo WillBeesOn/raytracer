@@ -1,6 +1,5 @@
-Images found at: https://www.cs.drexel.edu/~wtb35/cs636/hw6.html
+Images found at: https://www.cs.drexel.edu/~wtb35/cs636/hw7.html
 
 Code of note:
-Hall lighting model - materials/hall.rs, get_color function, line 35
-Reflection ray materials/hall.rs, get_color function, line 63
-Generalized function to get reflected ray: data_structures/vec3.rs, reflect function, line 48
+Calculating refracted ray: data_structures/vec3.rs, refract function, line 56
+Calculating refraction color in Hall shading model: materials/hall.rs, get_color function, lines 79 - 97
