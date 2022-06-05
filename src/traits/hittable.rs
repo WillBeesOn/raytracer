@@ -33,7 +33,7 @@ impl HitData {
             hit_point: vec3![0.0, 0.0, 0.0],
             ray: Ray::new(vec3![0.0, 0.0, 0.0], vec3![0.0, 0.0, 0.0]),
             normal: vec3![0.0, 0.0, 0.0],
-            mat: Material::Flat(Flat::new(vec3![0.5, 0.5, 0.5], 0.0)),
+            mat: Material::Flat(Flat::new(vec3![0.5, 0.5, 0.5])),
             did_hit: false
         }
     }

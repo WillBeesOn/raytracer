@@ -17,7 +17,7 @@ pub struct TriangleMesh {
 
 impl TriangleMesh {
     pub fn new(vertices: Matrix4, faces: Vec<Vec3>, smooth: bool) -> Self {
-        let material = Material::Flat(Flat::new(vec3![0.5, 0.5, 0.5], 0.0));
+        let material = Material::Flat(Flat::new(vec3![0.5, 0.5, 0.5]));
         let mut triangles = vec![];
         let mut vertex_normals = vec![vec3![0.0, 0.0, 0.0]; vertices.len()];  // Keep track of vert norms
         let mut vertex_indices = vec![]; // Keep track of vertex indices for each triangle to later assign the correct vertex normals
@@ -163,7 +163,7 @@ impl Clone for TriangleMesh {
 }
 
 impl Hittable for TriangleMesh {
-    fn hit(&self, ray: Ray, t_min: f64, t_max: f64) -> HitData {
+    fn hit(&self, ray: Ray, t_min: f64, _t_max: f64) -> HitData {
         let mut closest_hit = HitData::new();
 
         // Go through all triangles and find the closest one.

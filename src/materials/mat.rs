@@ -1,4 +1,4 @@
-use crate::{Light, Ray, Scene, Vec3};
+use crate::{Ray, Scene, Vec3};
 use crate::materials::{Flat, Hall, Phong};
 use crate::traits::HitData;
 

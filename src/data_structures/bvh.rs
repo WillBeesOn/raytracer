@@ -1,5 +1,3 @@
-use std::cmp::Ordering;
-use std::ops::Bound;
 use crate::objects::BoundingVolume;
 use crate::{Hittable, HittableList, Ray, Vec3, vec3};
 use crate::traits::HitData;

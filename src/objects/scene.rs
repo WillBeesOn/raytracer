@@ -250,8 +250,8 @@ impl Scene {
         let y = self.render_resolution.1;
 
         // Keep track of new rays and number of gets of cached color
-        let mut rays_shot: Arc<Mutex<u64>> = Arc::new(Mutex::new(0));
-        let mut cache_calls: Arc<Mutex<u64>> = Arc::new(Mutex::new(0));
+        let rays_shot: Arc<Mutex<u64>> = Arc::new(Mutex::new(0));
+        let cache_calls: Arc<Mutex<u64>> = Arc::new(Mutex::new(0));
 
         let mut handles = vec![]; // Keep track of threads
         let self_ptr = Arc::new(self); // Turn self into a pointer
@@ -264,7 +264,7 @@ impl Scene {
             let tx_clone = tx.clone();
             let self_clone = self_ptr.clone();
             let map_clone = sample_map.clone();
-            let mut ray_shot_clone = rays_shot.clone();
+            let ray_shot_clone = rays_shot.clone();
             let cache_calls_clone = cache_calls.clone();
 
             // Create a thread at each y position to render row of pixels

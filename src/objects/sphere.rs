@@ -44,7 +44,7 @@ impl SceneObject for Sphere {
     }
 
     // Doesn't really make sense to rotate sphere. Unless there's a texture on it.
-    fn rotate(&mut self, rotation: Vec3) { }
+    fn rotate(&mut self, _: Vec3) { }
 
     fn decompose(&self) -> HittableList {
         let mut list = HittableList::new();

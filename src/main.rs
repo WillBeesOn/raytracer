@@ -1,9 +1,9 @@
 use std::time::Instant;
 
-use crate::objects::{SceneObject, WorldLight, Light, Sphere, PointLight, Plane, AmbientLight};
+use crate::objects::{SceneObject, WorldLight, Light, Sphere, PointLight, AmbientLight};
 use crate::objects::{Camera, Scene};
 use crate::data_structures::{Ray, Vec3, Vector};
-use crate::materials::{Flat, Hall, Material, Phong};
+use crate::materials::{Hall, Material, Phong};
 use crate::traits::{Hittable, HittableList};
 use crate::utils::{load_smf_mesh, save_png};
 
@@ -12,12 +12,6 @@ mod data_structures;
 mod traits;
 mod materials;
 mod utils;
-
-// TODO
-//  at least two spheres, 1 refractive
-//  three non-box triangle meshes, 1 refractive
-//  two light sources, at least 1 white light
-//  You do not need to add specular transmission from the light sources to your shading calculations.
 
 fn main() {
     let dimension = 1024;
@@ -424,7 +418,7 @@ fn main() {
     ]);
 
     let now = Instant::now();
-    let (computed, heatmap) = scene.render_supersample_frame_threaded(0.05);
+    let (computed, _heatmap) = scene.render_supersample_frame_threaded(0.05);
     //let computed = scene.render_frame_threaded();
     println!("Took {:.2?} to render.", now.elapsed());
     save_png(&computed, resolution, "out.png");

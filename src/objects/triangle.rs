@@ -60,7 +60,7 @@ impl SceneObject for Triangle {
     }
 
     // Don't bother with this, it'll be handled in transform function
-    fn rotate(&mut self, rotation: Vec3) { }
+    fn rotate(&mut self, _rotation: Vec3) { }
 
     fn decompose(&self) -> HittableList {
         let mut list = HittableList::new();

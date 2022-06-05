@@ -1,7 +1,6 @@
 use crate::{Ray, Scene, Vec3, vec3, WorldLight};
 use crate::data_structures::Vector;
 use crate::materials::Mat;
-use crate::objects::Light;
 use crate::traits::HitData;
 
 #[derive(Debug, Copy, Clone)]
@@ -23,7 +22,7 @@ impl Phong {
 impl Mat for Phong {
     // Gets the color for a point on a surface using the Phong shading model.
     // diffuse_factor * diffuse + specular_factor * specular
-    fn get_color(&self, scene: &Scene, incoming_ray: Ray, hit: &HitData, reflect_depth: u32) -> Vec3 {
+    fn get_color(&self, scene: &Scene, _incoming_ray: Ray, hit: &HitData, _reflect_depth: u32) -> Vec3 {
         let mut final_diffuse = vec3![0.0, 0.0, 0.0];
         let mut final_specular = vec3![0.0, 0.0, 0.0];
 
@@ -42,9 +41,7 @@ impl Mat for Phong {
             let specular = view_dir.dot(reflect).max(0.0).powf(self.shine_factor);
             final_specular += light_color * specular;
         }
-        // TODO need to change ambient... Well, do I really?
-        //  An ambient light will have it's own intensity, and the object has it's own factor which determines how much the ambient light affects it.
-        //  However, the "correct" way is ultimately a single scalar, so why can't this be valid? The single scalar would have the ambient light intensity and the object's ambient factor encoded in it.
+
         self.albedo * (self.diffuse_factor * final_diffuse + self.specular_factor * final_specular + self.ambient_factor)
     }
 }

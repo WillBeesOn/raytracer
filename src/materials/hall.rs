@@ -1,7 +1,6 @@
 use crate::{Ray, Scene, Vec3, vec3, WorldLight};
 use crate::data_structures::Vector;
 use crate::materials::Mat;
-use crate::objects::Light;
 use crate::traits::HitData;
 
 #[derive(Debug, Copy, Clone)]
