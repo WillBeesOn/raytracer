@@ -4,7 +4,7 @@ A software raytracer written in Rust.
 Supported features:
 - Rendering of models in [`smf`](https://people.sc.fsu.edu/~jburkardt/txt/smf_format.txt) format.
 - Phong and parts of [Hall Greenberg](https://ieeexplore.ieee.org/document/4037684) shading models
-- Multi-color point lights
+- Point lights
 - Shadows, reflections, and refraction
 - Bounding volume hierarchy acceleration
 - Post-processing supersample anti-aliasing
